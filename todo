@@ -1,0 +1,4 @@
+1. Add an option that turns dev mode on or off
+2. Add allowed hosts to section, which should be set to all on a django project
+3. Set up gunicorn middleware configuration if it is present in the requirements 
+4. Find a way to run python manage.py collectstatic
