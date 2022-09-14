@@ -16,6 +16,13 @@ def ERROR(value):
 DESCRIPTION = "This project is centred around formatting and editing web applications made in Django, FastApi or flask into the correct deployable format for popular hosting platforms such as Heroku, Railway, Render etc…"
 EPILOG = "Simple automation project made by SydneyIdundun"
 PROG = "PyDeploy"
+DJANGO_SETTING_ESSENTIALS = [
+    "ALLOWED_HOSTS",
+    "CSRF_TRUSTED_ORIGINS",
+    "STATIC_ROOT",
+    "CORS_ORIGIN_ALLOW_ALL",
+    "DEBUG",
+]
 
 py_deploy_parser = argparse.ArgumentParser(
     prog = PROG,
@@ -62,21 +69,36 @@ def generate_procfile():
     print("Generating Procfile")
     settings_file = find("settings.py","./")
     config = ""
+    settings_content = ""
     with open(settings_file, 'r') as settings:
         lines = settings.readlines()
+        settings_content = lines
         for line in lines:
             if "WSGI_APPLICATION" in line:
                 temp = str(line).split("=")[1].replace("'","").replace(".application", "").replace(" ", "").replace("\n", "")
                 procfile_config = f"web: gunicorn '{temp}'"
                 config = procfile_config
+                break
     if config != "":
         with open("./Procfile", "w") as Procfile:
             Procfile.writelines(procfile_config+"\n")
             print(SUCCESS("Your project is ready to be deployed!!!"))
+            return settings_content
     else:
         print(ERROR(f"{PROG} could failed to generate Procfile"))
         sys.exit()
 
+
+def settings_setup(settings_content):
+    # here we want to test if the following configurations already exist within
+    # the settings.py file
+    for configs in DJANGO_SETTING_ESSENTIALS:
+        if configs not in settings_content:
+            print(f"{configs} not found in settings.py")
+        else:
+            print(SUCCESS(f"{configs} not foundsettings.py"))
+
+    
 
 if args.platform == "railway":
     print(f"Configuring files for {args.platform} deployment")
@@ -87,7 +109,11 @@ if args.platform == "railway":
     print(f"Detecting python version\n{version}")
     generate_runtime(version)
     generate_requirements(dependency)
-    generate_procfile()
+    settings_content = generate_procfile()
+    if settings_content != "":
+        settings_setup(settings_content)
+
+
 else:
     print(ERROR(f"{PROG} currently does not support this platform "))
 

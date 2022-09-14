@@ -2,3 +2,6 @@
 2. Add allowed hosts to section, which should be set to all on a django project
 3. Set up gunicorn middleware configuration if it is present in the requirements 
 4. Find a way to run python manage.py collectstatic
+5. check if the file name in the settings.py file for collecting static exists in the project dir
+if the folder exists then print[ static files found]
+6. check if drf exists as a dependency and ask the user if they wish to configure cors, if cors have not already been configured
