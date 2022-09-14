@@ -93,10 +93,10 @@ def settings_setup(settings_content):
     # here we want to test if the following configurations already exist within
     # the settings.py file
     for configs in DJANGO_SETTING_ESSENTIALS:
-        if configs not in settings_content:
+        if configs not in "".join(settings_content):
             print(f"{configs} not found in settings.py")
         else:
-            print(SUCCESS(f"{configs} not foundsettings.py"))
+            print(SUCCESS(f"{configs} found in settings.py"))
 
     
 
