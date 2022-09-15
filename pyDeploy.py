@@ -8,6 +8,8 @@ import argparse
 import subprocess
 
 
+
+
 def SUCCESS(value):
     return f"\033[1;32m{value}\033[00m"
 def ERROR(value):
@@ -48,6 +50,7 @@ def detect_project(dependencies):
     else: 
         print(ERROR("UNKNOWN project type"))
         sys.exit()
+    dependencies = dependencies.replace('\r', '')
     return dependencies
 def detect_python_version():
     version = sys.version.split(" ")[0]
@@ -59,6 +62,7 @@ def generate_runtime(version):
 def generate_requirements(dependencies):
     with open("./requirements.txt", 'w') as requirements:
         requirements.writelines(dependencies)
+        
 
 def find(name, path):
     for root, dirs, files in os.walk(path):
@@ -97,8 +101,20 @@ def settings_setup(settings_content):
             print(f"{configs} not found in settings.py")
         else:
             print(SUCCESS(f"{configs} found in settings.py"))
+ 
 
-    
+def generate_build_file():
+    build_config=["#!/usr/bin/env bash\n", 
+                  "# exit on error\n",
+                   "set -o errexit \n", 
+                   "pip install -r requirements.txt \n",
+                   "python manage.py collectstatic --no-input\n",
+                   "python manage.py migrate \n",]
+    with open("./build.sh", 'w') as build:
+        build.writelines(build_config)   
+
+def generate_renderyaml_file():
+    pass        
 
 if args.platform == "railway":
     print(f"Configuring files for {args.platform} deployment")
@@ -113,6 +129,14 @@ if args.platform == "railway":
     if settings_content != "":
         settings_setup(settings_content)
 
+elif args.platform=="render":
+    print(f"Configuring files for {args.platform} deployment") 
+    requirements = subprocess.check_output([sys.executable, "-m", "pip", "freeze"])
+    dependency = detect_project(requirements.decode("utf-8").lower()) 
+    generate_requirements(dependency)
+    generate_build_file() 
+    os.system('chmod a+x build.sh') 
+    
 
 else:
     print(ERROR(f"{PROG} currently does not support this platform "))
