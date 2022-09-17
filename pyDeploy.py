@@ -41,7 +41,7 @@ elif args.platform == "heroku":
     print(f"Detecting python version\n{version}")
     generate_runtime(version)
     generate_requirements(dependency)
-    settings_content = generate_procfile()
+    settings_content = generate_procfile(args.platform)
     if settings_content != "":
         settings_setup(settings_content)
 
