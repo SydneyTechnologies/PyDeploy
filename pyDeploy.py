@@ -31,6 +31,20 @@ elif args.platform=="render":
     generate_requirements(dependency)
     generate_build_file() 
     os.system('chmod a+x build.sh') 
+
+elif args.platform == "heroku":
+    print(f"Configuring files for {args.platform} deployment")
+    requirements = subprocess.check_output([sys.executable, "-m", "pip", "freeze"])
+    print("Detecting project type")
+    dependency = detect_project(requirements.decode("utf-8").lower())
+    version = detect_python_version()
+    print(f"Detecting python version\n{version}")
+    generate_runtime(version)
+    generate_requirements(dependency)
+    settings_content = generate_procfile()
+    if settings_content != "":
+        settings_setup(settings_content)
+
     
 
 else:

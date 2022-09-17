@@ -9,7 +9,7 @@ def generate_runtime(version):
         runtime.writelines("Python " + version)
 
 
-def generate_procfile():
+def generate_procfile(platform="railway"):
     print("Generating Procfile")
     settings_file = find("settings.py","./")
     config = ""
@@ -20,8 +20,12 @@ def generate_procfile():
         for line in lines:
             if "WSGI_APPLICATION" in line:
                 temp = str(line).split("=")[1].replace("'","").replace(".application", "").replace(" ", "").replace("\n", "")
-                procfile_config = f"web: gunicorn '{temp}'"
-                config = procfile_config
+                if platform == "railway":
+                    procfile_config = f"web: gunicorn '{temp}'"
+                    config = procfile_config
+                elif platform == "heroku":
+                    procfile_config = f"web: gunicorn {temp} --log-file -"
+                    config = procfile_config
                 break
     if config != "":
         with open("./Procfile", "w") as Procfile:
