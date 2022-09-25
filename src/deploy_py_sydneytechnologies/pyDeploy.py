@@ -6,8 +6,8 @@ import os
 import sys
 import subprocess
 import argparse
-from src.DeployPy.utils import*
-from src.DeployPy.Django.django_utils import *
+from src.deploy_py_sydneytechnologies.utils import*
+from src.deploy_py_sydneytechnologies.Django.django_utils import *
 
 DESCRIPTION = "This project is centred around formatting and editing web applications made in Django, FastApi or flask into the correct deployable format for popular hosting platforms such as Heroku, Railway, Render etc…"
 EPILOG = "Simple automation project made by SydneyIdundun"
