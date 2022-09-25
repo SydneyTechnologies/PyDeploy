@@ -1,7 +1,6 @@
 #this file contains utitlities that help deployment across all platforms
 import os
 import sys
-import argparse
 
 def SUCCESS(value):
     return f"\033[1;32m{value}\033[00m"
@@ -12,84 +11,22 @@ def WARNING(value):
 def ERROR(value):
     return f"\033[1;91m{value}\033[00m"
 
+class Logger():
+    issues = {}
+    def __init__(self) -> None:
+        pass
+    def addIssue(self, header, issue):
+        self.issues[header] = issue
+    def displayLogs(self):
+        if self.issues != {}:
+            print("Issues Logged During Project Configuration")
+            for key, value in self.issues:
+                print(f"{key}: {value}")
 
-DESCRIPTION = "This project is centred around formatting and editing web applications made in Django, FastApi or flask into the correct deployable format for popular hosting platforms such as Heroku, Railway, Render etc…"
-EPILOG = "Simple automation project made by SydneyIdundun"
-PROG = "PyDeploy"
-DJANGO_SETTING_ESSENTIALS = [
-    "ALLOWED_HOSTS",
-    "CSRF_TRUSTED_ORIGINS",
-    "STATIC_ROOT",
-    "CORS_ORIGIN_ALLOW_ALL",
-    "DEBUG",
-]
-
-py_deploy_parser = argparse.ArgumentParser(
-    prog = PROG,
-    description=DESCRIPTION,
-    epilog=EPILOG,
-)
-
-# the platform that will be supported first will be railway
-supported_platforms = ["heroku", "railway", "render"]
-PLATFORM_DESCRIPTION = f"The platform argument helps {PROG} to configure for the right platform, it is a required argument"
-py_deploy_parser.add_argument('platform', help=PLATFORM_DESCRIPTION, type=str.lower, choices=supported_platforms)
-
-args = py_deploy_parser.parse_args()
+logger = Logger()
 
 
-
-
-def settings_setup(settings_content):
-    # here we want to test if the following configurations already exist within
-    # the settings.py file
-    for configs in DJANGO_SETTING_ESSENTIALS:
-        if configs not in "".join(settings_content):
-            print(f"{configs} not found in settings.py")
-            RectifySettings(config=configs)
-        else:
-            print(SUCCESS(f"{configs} found in settings.py"))
-
-def RectifySettings(config):
-    # this function will either fix or warn the user about a missing configuration
-    # required in the settings.py file for a Django project
-    TARGET = "settings.py"
-    settings = getFile(TARGET)
-    if config == DJANGO_SETTING_ESSENTIALS[0]:
-        # this refers to the allowed hosts
-        user_input = input(WARNING(f"would you like to setup the default configuration for django {config} y/n?"))
-        if user_input.lower() == "y":
-            with open(settings, 'a') as file:
-                file.write(f"\n{config}=[*]")
-        else:
-            print(f"configure {config} in your settings.py file")
-
-    
-    elif config == DJANGO_SETTING_ESSENTIALS[1]:
-        # this refers to csrf_trusted_origins 
-        print(f"configure {config} in your settings.py file")
-    elif config == DJANGO_SETTING_ESSENTIALS[2]:
-        # this config refers to the static root files
-        print(f"configure {config} in your settings.py file")
-    elif config == DJANGO_SETTING_ESSENTIALS[3]:
-        # this config refers to the CORS configuration root files
-        user_input = input(WARNING(f"would you like to setup the default configuration for django {config} y/n?"))
-        if user_input.lower() == "y":
-            with open(settings, 'a') as file:
-                file.write(f"\n{config}=True")
-        else:
-            print(f"configure {config} in your settings.py file")
-    elif config == DJANGO_SETTING_ESSENTIALS[4]:
-          # this config refers to the DEBUG setting
-        user_input = input(WARNING(f"would you like to setup the default configuration for django {config} y/n?"))
-        if user_input.lower() == "y":
-            with open(settings, 'a') as file:
-                file.write(f"\n{config}=True")
-        else:
-            print(f"configure {config} in your settings.py file")
-
-
-def detect_project(dependencies):
+def detectProject(dependencies):
     if dependencies.__contains__("django"):
         print(SUCCESS("Django project detected"))
     elif dependencies.__contains__("fastApi"):
@@ -102,7 +39,7 @@ def detect_project(dependencies):
     dependencies = dependencies.replace('\r', '')
     return dependencies    
 
-def generate_requirements(dependencies):
+def generateRequirements(dependencies):
     with open("./requirements.txt", 'w') as requirements:
         requirements.writelines(dependencies)
         
@@ -118,16 +55,16 @@ def getFile(file_name):
     if file_location :
         return file_location
 
-def detect_python_version():
+def detectPythonVersion():
     version = sys.version.split(" ")[0]
     return version            
 
-def generate_runtime(version):
+def generateRuntime(version):
     with open("./runtime.txt", 'w') as runtime:
         runtime.writelines("Python " + version)
 
 
-def generate_procfile(platform="railway"):
+def generateProcfile(platform="railway"):
     print("Generating Procfile")
     settings_file = find("settings.py","./")
     config = ""
@@ -151,5 +88,22 @@ def generate_procfile(platform="railway"):
             print(SUCCESS("Your project is ready to be deployed!!!"))
             return settings_content
     else:
-        print(ERROR(f"{PROG} could failed to generate Procfile"))
+        print(ERROR(f"Could failed to generate Procfile"))
         sys.exit()        
+
+def generate_build_file():
+    """
+    genatates a build file
+    """
+    build_config=["#!/usr/bin/env bash\n", 
+                  "# exit on error\n",
+                   "set -o errexit \n", 
+                   "pip install -r requirements.txt \n",
+                   "python manage.py collectstatic --no-input\n",
+                   "python manage.py migrate \n",]
+    with open("./build.sh", 'w') as build:
+        build.writelines(build_config)  
+
+
+def generate_renderyaml_file():
+    pass           
