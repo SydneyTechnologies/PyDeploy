@@ -1,7 +1,5 @@
 #this file contains all functions that automate render deployment
 
-
-
 def generate_build_file():
     """
     genatates a build file

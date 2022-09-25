@@ -9,12 +9,6 @@ def ERROR(value):
     return f"\033[1;91m{value}\033[00m"
 
 
-
-
-
-
-
-
 DESCRIPTION = "This project is centred around formatting and editing web applications made in Django, FastApi or flask into the correct deployable format for popular hosting platforms such as Heroku, Railway, Render etc…"
 EPILOG = "Simple automation project made by SydneyIdundun"
 PROG = "PyDeploy"
@@ -79,3 +73,35 @@ def find(name, path):
 def detect_python_version():
     version = sys.version.split(" ")[0]
     return version            
+
+def generate_runtime(version):
+    with open("./runtime.txt", 'w') as runtime:
+        runtime.writelines("Python " + version)
+
+
+def generate_procfile(platform="railway"):
+    print("Generating Procfile")
+    settings_file = find("settings.py","./")
+    config = ""
+    settings_content = ""
+    with open(settings_file, 'r') as settings:
+        lines = settings.readlines()
+        settings_content = lines
+        for line in lines:
+            if "WSGI_APPLICATION" in line:
+                temp = str(line).split("=")[1].replace("'","").replace(".application", "").replace(" ", "").replace("\n", "")
+                if platform == "railway":
+                    procfile_config = f"web: gunicorn '{temp}'"
+                    config = procfile_config
+                elif platform == "heroku":
+                    procfile_config = f"web: gunicorn {temp} --log-file -"
+                    config = procfile_config
+                break
+    if config != "":
+        with open("./Procfile", "w") as Procfile:
+            Procfile.writelines(procfile_config+"\n")
+            print(SUCCESS("Your project is ready to be deployed!!!"))
+            return settings_content
+    else:
+        print(ERROR(f"{PROG} could failed to generate Procfile"))
+        sys.exit()        

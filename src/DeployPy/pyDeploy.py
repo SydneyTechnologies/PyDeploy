@@ -5,9 +5,8 @@
 import os
 import sys
 import subprocess
-from render import generate_build_file
-from utils import*
-from heroku_render import*
+from src.DeployPy.render import generate_build_file
+from src.DeployPy.utils import*
 
 
 
