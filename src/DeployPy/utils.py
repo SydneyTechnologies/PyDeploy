@@ -40,9 +40,14 @@ def detectProject(dependencies):
     return dependencies    
 
 def generateRequirements(dependencies):
-    with open("./requirements.txt", 'w') as requirements:
+    location = navigate("manage.py")
+    with open(f"{location}requirements.txt", 'w') as requirements:
         requirements.writelines(dependencies)
-        
+
+def navigate(reference):
+    location = find(reference, os.getcwd).replace(reference, "")
+    print(location)
+    return location
 
 def find(name, path):
     for root, dirs, files in os.walk(path):
@@ -52,21 +57,21 @@ def find(name, path):
 def getFile(file_name):
     current_dir = os.getcwd()
     file_location = find(file_name, current_dir)
-    if file_location :
-        return file_location
+    return file_location
 
 def detectPythonVersion():
     version = sys.version.split(" ")[0]
     return version            
 
 def generateRuntime(version):
-    with open("./runtime.txt", 'w') as runtime:
+    location = navigate("manage.py")
+    with open(f"{location}runtime.txt", 'w') as runtime:
         runtime.writelines("Python " + version)
 
 
 def generateProcfile(platform="railway"):
     print("Generating Procfile")
-    settings_file = find("settings.py","./")
+    settings_file = find("settings.py", os.getcwd())
     config = ""
     settings_content = ""
     with open(settings_file, 'r') as settings:
