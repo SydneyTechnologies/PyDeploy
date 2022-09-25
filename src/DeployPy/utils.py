@@ -5,6 +5,10 @@ import argparse
 
 def SUCCESS(value):
     return f"\033[1;32m{value}\033[00m"
+
+def WARNING(value):
+    return f"\033[1;33m{value}\033[00m"
+
 def ERROR(value):
     return f"\033[1;91m{value}\033[00m"
 
@@ -34,15 +38,55 @@ py_deploy_parser.add_argument('platform', help=PLATFORM_DESCRIPTION, type=str.lo
 args = py_deploy_parser.parse_args()
 
 
+
+
 def settings_setup(settings_content):
     # here we want to test if the following configurations already exist within
     # the settings.py file
     for configs in DJANGO_SETTING_ESSENTIALS:
         if configs not in "".join(settings_content):
             print(f"{configs} not found in settings.py")
+            RectifySettings(config=configs)
         else:
             print(SUCCESS(f"{configs} found in settings.py"))
 
+def RectifySettings(config):
+    # this function will either fix or warn the user about a missing configuration
+    # required in the settings.py file for a Django project
+    TARGET = "settings.py"
+    settings = getFile(TARGET)
+    if config == DJANGO_SETTING_ESSENTIALS[0]:
+        # this refers to the allowed hosts
+        user_input = input(WARNING(f"would you like to setup the default configuration for django {config} y/n?"))
+        if user_input.lower() == "y":
+            with open(settings, 'a') as file:
+                file.write(f"\n{config}=[*]")
+        else:
+            print(f"configure {config} in your settings.py file")
+
+    
+    elif config == DJANGO_SETTING_ESSENTIALS[1]:
+        # this refers to csrf_trusted_origins 
+        print(f"configure {config} in your settings.py file")
+    elif config == DJANGO_SETTING_ESSENTIALS[2]:
+        # this config refers to the static root files
+        print(f"configure {config} in your settings.py file")
+    elif config == DJANGO_SETTING_ESSENTIALS[3]:
+        # this config refers to the CORS configuration root files
+        user_input = input(WARNING(f"would you like to setup the default configuration for django {config} y/n?"))
+        if user_input.lower() == "y":
+            with open(settings, 'a') as file:
+                file.write(f"\n{config}=True")
+        else:
+            print(f"configure {config} in your settings.py file")
+    elif config == DJANGO_SETTING_ESSENTIALS[4]:
+          # this config refers to the DEBUG setting
+        user_input = input(WARNING(f"would you like to setup the default configuration for django {config} y/n?"))
+        if user_input.lower() == "y":
+            with open(settings, 'a') as file:
+                file.write(f"\n{config}=True")
+        else:
+            print(f"configure {config} in your settings.py file")
 
 
 def detect_project(dependencies):
@@ -68,7 +112,11 @@ def find(name, path):
         if name in files:
             return os.path.join(root, name)
 
-
+def getFile(file_name):
+    current_dir = os.getcwd()
+    file_location = find(file_name, current_dir)
+    if file_location :
+        return file_location
 
 def detect_python_version():
     version = sys.version.split(" ")[0]
