@@ -3,11 +3,10 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "deploy_py_sydneytechnologies"
+name = "deployPyTest"
 version = "0.0.1"
 authors = [
   { name="Sydney Idundun", email="sydney.idundun@gmail.com" },
-  { name="Julius Okputu", email="" },
 ]
 description = "A CLI tool that helps Python developers deploy faster."
 readme = "README.md"
