@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "deployPyTest"
+name = "DeployPy"
 version = "0.0.1"
 authors = [
   { name="Sydney Idundun", email="sydney.idundun@gmail.com" },
@@ -16,6 +16,8 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+[project.scripts]
+pydeploy = "DeployPy.pyDeploy:initialize"
 
 [project.urls]
 "Homepage" = "https://github.com/pypa/sampleproject"

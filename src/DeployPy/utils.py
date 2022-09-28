@@ -45,7 +45,7 @@ def generateRequirements(dependencies):
         requirements.writelines(dependencies)
 
 def navigate(reference):
-    location = find(reference, os.getcwd).replace(reference, "")
+    location = find(reference, os.getcwd()).replace(reference, "")
     print(location)
     return location
 

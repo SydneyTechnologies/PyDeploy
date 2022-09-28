@@ -67,7 +67,3 @@ def initialize():
 
     logger.displayLogs()
 
-
-if __name__ == "__main__":
-    """This runs when you execute '$ python3 mypackage/mymodule.py'"""
-    initialize()
